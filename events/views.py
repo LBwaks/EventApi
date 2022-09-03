@@ -5,11 +5,16 @@ from .serializers import UserSerializer,TagSerializer,CategorySerializer,EventSe
 from rest_framework import viewsets
 from rest_framework.response import Response
 from .models import Event,Tag,Category
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from .permissions import OwnerToEditOrDelete
+
 
 
 
 # Create your views here.
 class EventsViewset(viewsets.ModelViewSet):
+
+    permission_classes = [IsAuthenticatedOrReadOnly,OwnerToEditOrDelete]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = []
+    
