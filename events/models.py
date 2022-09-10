@@ -4,15 +4,14 @@ from django.conf import settings
 from django.template.defaultfilters import slugify
 from .choices import county,types
 from django.db.models.signals import pre_save
-# from 
+from .managers import PublishedEventsManager,PublishedTagManager,PublishedCategoryManager
 import random ,string
+from django.urls import reverse
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
 
-class CategoryManager(models.Manager):
-    def published(self):
-        return self.filter(is_published = True)
+
 
 class Category(models.Model):
     user =models.ForeignKey(User,editable=False,related_name='events_category', on_delete=models.CASCADE,null=False)
@@ -22,6 +21,9 @@ class Category(models.Model):
     is_published = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
+
+    objects =models.Manager()
+    publishedCategory = PublishedCategoryManager()
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -41,8 +43,9 @@ class Tag(models.Model):
     is_featured = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    # category = CategoryManager()
-    # objects =models.Manager()
+    
+    objects =models.Manager()
+    publishedTags = PublishedTagManager()
     
 
     def __str__(self):
@@ -53,9 +56,7 @@ class Tag(models.Model):
             self.slug= slugify('name')
         return super().save(*args, **kwargs)
 
-class TagManager(models.Manager):
-    def published(self):
-        return self.filter(is_published = True)
+
 
 
 def random_string_generotor(size=10,chars = string.ascii_lowercase + string.digits):
@@ -69,6 +70,10 @@ def unique_event_id_generation(instance):
         return unique_event_id_generation(instance)
     return new_event_id
 
+
+
+   
+
 class Event(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=False)
@@ -81,10 +86,10 @@ class Event(models.Model):
     type = models.CharField(choices=types,max_length=20)
 
 #  date and time
-    start_date = models.DateField()
-    start_time = models.TimeField()
-    end_date = models.DateField(blank= True,null=True)
-    end_time = models.TimeField(blank= True,null=True)
+    start_date = models.DateTimeField()
+    # start_time = models.TimeField()
+    end_date = models.DateTimeField(blank= True,null=True)
+    # end_time = models.TimeField(blank= True,null=True)
 
 # location 
     county = models.CharField(choices=county, max_length=20,default='Nairobi')
@@ -109,8 +114,8 @@ class Event(models.Model):
     updated_date = models.DateTimeField(null=True,blank=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
-    # objects =models.Manager()
-    # tag = TagManager()
+    objects =models.Manager()
+    publishedEvents = PublishedEventsManager()
 
     def __str__(self):
         return self.name
@@ -120,4 +125,7 @@ def pre_save_event_id(sender,instance,*args, **kwargs):
     if not instance.event_id:
         instance.event_id =unique_event_id_generation(instance)
 pre_save.connect(pre_save_event_id,sender=Event)
+
+# def get_absolute_url(self):
+#     return reverse("event-detail", kwargs={"slug": self.slug})
 

@@ -6,7 +6,14 @@ from django.contrib.auth.models import User
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event 
-        fields = '__all__'
+        fields = ['id','user','tag','event_id','name','slug','description','type',
+                 'start_date','end_date','county','town','address','venue','charge',
+                 'max_attendees','event_host' ,'event_partners','main_speaker_artist',
+                 'other_speaker_artist','likes','is_featured','is_published','updated_date','created_date']
+        read_only_fields =['user','slug',]
+        # def validate(self,attrs):
+        #     attrs['user']= self.context['request'].user
+        #     return attrs
 
 class TagSerializer(serializers.ModelSerializer):
     event =EventSerializer(read_only = True, many =True)

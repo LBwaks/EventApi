@@ -25,7 +25,7 @@ admin.site.register(Tag,TagEventAdmin)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('event_id','name','tag','type','is_featured','is_published','updated_date','created_date',)
+    list_display = ('event_id','name','tag','type','start_date','is_featured','is_published','created_date',)
     prepopulated_fields = {'slug':('name',)}
     # search_fields =('','','','','','','','','','','','','','','','','','','','','')
     def save_model(self,request,obj,form,change):
