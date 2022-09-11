@@ -110,6 +110,7 @@ class Event(models.Model):
     likes= models.IntegerField(blank= True,null=True)
     is_featured = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
+    bookmark =models.ManyToManyField(User,related_name='bookmarks',blank=True,default=None)
 
     updated_date = models.DateTimeField(null=True,blank=True)
     created_date = models.DateTimeField(auto_now_add=True)

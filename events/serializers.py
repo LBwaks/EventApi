@@ -9,16 +9,16 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ['id','user','tag','event_id','name','slug','description','type',
                  'start_date','end_date','county','town','address','venue','charge',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
-                 'other_speaker_artist','likes','is_featured','is_published','updated_date','created_date']
+                 'other_speaker_artist','bookmark','likes','is_featured','is_published','updated_date','created_date']
         read_only_fields =['user','slug',]
         # def validate(self,attrs):
         #     attrs['user']= self.context['request'].user
         #     return attrs
 
 class TagSerializer(serializers.ModelSerializer):
-    event =EventSerializer(read_only = True, many =True)
+    events =EventSerializer(read_only = True, many =True)
     class Meta:
-        model = '__all__'
+        model = ['name','slug','events']
 
 
 class CategorySerializer(serializers.ModelSerializer):

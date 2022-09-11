@@ -10,6 +10,7 @@ from .permissions import OwnerToEditOrDelete
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics 
+from django.shortcuts import get_object_or_404
 
 
 
@@ -32,4 +33,32 @@ class EventsViewset(viewsets.ModelViewSet):
 #         # events = Event.objects.filter()
 #         queryset =super().get_queryset()
 #         return queryset.filter(tag=1)
+
+class UserEvents(generics.ListAPIView):
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs['user_id']
+        return Event.publishedEvents.filter(user_id=user_id)
+
+class MyEvents(generics.ListAPIView):
+    serializer_class = EventSerializer
+
+    def get_queryset(self):
+        user =self.request.user.id         
+        return Event.objects.filter(user=user)
+
+
+class EventByTag(generics.ListAPIView):
+    serializer_class = EventSerializer
+    queryset =Event.objects.all()
+    # lookup_field ='slug'
+    # def get_queryset(self):
+    #     slug = self.request.query_params.get('slug')
+    #     tag = get_object_or_404(Tag,slug=slug)
+    #     # events =Event.objects.filter(tag = tags)
+    #     return Event.publishedEvents.filter(tag = tag)
+    def get_queryset(self):
+        queryset =super().get_queryset()
+        return queryset.filter(tag_id = self.kwargs['tag_id'])
     
