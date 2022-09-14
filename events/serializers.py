@@ -1,17 +1,49 @@
+from cgitb import lookup
 from rest_framework import serializers
 from .models import Event,Tag,Category
 from django.contrib.auth.models import User
 
 
+class UserSerializer(serializers.ModelField):
+    # category = CategorySerializer(read_only = True, many =True)
+    # tag =EventSerializer(read_only = True, many =True)
+    # event =EventSerializer(read_only = True, many =True)
+    class Meta:
+        model = User
+        fields = ['id','username']
+
+class TagSerializer(serializers.ModelSerializer):
+    # events =EventSerializer(read_only = True, many =True)
+    class Meta:
+        model = ['name','slug','events']
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url':{'view_name':'tag-detail','lookup_field':'slug'}
+        }
+
 class EventSerializer(serializers.ModelSerializer):
+    # tag = TagSerializer(many=True)
+    # owner = UserSerializer( many=True, read_only=True)
+
     class Meta:
         model = Event 
-        fields = ['id','event_id','user','tag','name','slug','description','type',
+        fields = ['id','event_id','url',
+        # 'owner',
+        'user','tag','name','slug','description','type',
                  'start_date','end_date','county','town','address','venue','charge',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
                  'other_speaker_artist','bookmark','likes','is_featured','is_published','updated_date','created_date']
         read_only_fields =['user','event_id']
-      
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'view_name':'event-detail','lookup_field': 'slug'}
+        }
+    def to_representation(self, instance):
+            representation = super().to_representation(instance)
+            representation['event_likes'] = instance.likes.count()
+            return representation
+
+
     def validate(self,data):
         if data['start_date'] == data['end_date']:
             raise serializers.ValidationError('Event Start Data Cannot Be Same As Event End Date')
@@ -60,9 +92,13 @@ class EventSerializer(serializers.ModelSerializer):
         return value
    
 class TagSerializer(serializers.ModelSerializer):
-    events =EventSerializer(read_only = True, many =True)
+    # events =EventSerializer(read_only = True, many =True)
     class Meta:
-        model = ['name','slug','events']
+        model = ['name','url','slug','events']
+        # lookup_field = 'slug'
+        extra_kwargs = {
+            'url':{'view_name':'tag-detail','lookup_field':'slug'}
+        }
 
 
 class CategorySerializer(serializers.ModelSerializer):

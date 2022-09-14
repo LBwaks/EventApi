@@ -107,7 +107,7 @@ class Event(models.Model):
     main_speaker_artist =models.CharField(max_length=50,blank= True,null=True)
     other_speaker_artist = models.CharField(max_length=50,blank=True,null=True)
 
-    likes= models.IntegerField(blank= True,null=True)
+    likes = models.ManyToManyField(User, related_name = "likes", blank= True)
     is_featured = models.BooleanField(default=False)
     is_published = models.BooleanField(default=False)
     bookmark =models.ManyToManyField(User,related_name='bookmarks',blank=True,default=None)
