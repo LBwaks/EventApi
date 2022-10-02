@@ -2,7 +2,7 @@ from re import search
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from .serializers import EventSerializer##UserSerializer,TagSerializer,CategorySerializer,
+from .serializers import EventSerializer, TagSerializer##UserSerializer,TagSerializer,CategorySerializer,
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -35,7 +35,10 @@ class MultipleFieldLookupMixin():
         obj = get_object_or_404(queryset, **filter)  # Lookup the object
         self.check_object_permissions(self.request, obj)
         return obj
-
+class EventsViewset(viewsets.ModelViewSet):
+    queryset = Tag.publishedTags.all()
+    serializer_class = TagSerializer
+    
 class EventsViewset(viewsets.ModelViewSet):
     # authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly,OwnerToEditOrDelete]
@@ -128,5 +131,5 @@ class EventByTag(generics.ListAPIView):
     #     return Event.publishedEvents.filter(tag = tag)
     def get_queryset(self):
         queryset =super().get_queryset()
-        return queryset.filter(tag_id = self.kwargs['tag_id'])
+        return queryset.filter(slug = self.kwargs['slug'])
     

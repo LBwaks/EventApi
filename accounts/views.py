@@ -6,6 +6,8 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from .serializers import UserSerializer
 from events.serializers import EventSerializer
 from events.models import Event
+from accounts.models import Profile
+from accounts.serializers import ProfileSerializer
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from allauth.account.views import ConfirmEmailView
@@ -28,7 +30,9 @@ class UserViewset(viewsets.ModelViewSet):
     serializer_class =UserSerializer
     queryset = User.objects.all()
 
-
+class ProfileViewset(viewsets.ModelViewSet):
+    serializer_class = ProfileSerializer
+    queryset =Profile.objects.all()
     
     
 class CustomConfirmEmailView(ConfirmEmailView):

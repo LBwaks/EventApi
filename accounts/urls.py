@@ -1,6 +1,6 @@
 from django.urls import path ,re_path
 from rest_framework.routers import DefaultRouter
-from .views import UserViewset
+from .views import UserViewset,ProfileViewset
 # ,MyEvents,UserEvents
 from dj_rest_auth.registration.views import RegisterView, VerifyEmailView, ConfirmEmailView
 from dj_rest_auth.views import LoginView, LogoutView
@@ -8,6 +8,7 @@ from allauth.account.views import confirm_email as allauthemailconfirmation
 
 router=DefaultRouter()
 router.register(r'users',UserViewset)
+router.register(r'profiles',ProfileViewset)
 
 urlpatterns = [
 # auth urls

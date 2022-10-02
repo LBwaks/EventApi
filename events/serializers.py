@@ -4,39 +4,38 @@ from .models import Event,Tag,Category
 from django.contrib.auth.models import User
 
 
-class UserSerializer(serializers.ModelField):
-    # category = CategorySerializer(read_only = True, many =True)
-    # tag =EventSerializer(read_only = True, many =True)
-    # event =EventSerializer(read_only = True, many =True)
+class UserSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = User
         fields = ['id','username']
 
-class TagSerializer(serializers.ModelSerializer):
-    # events =EventSerializer(read_only = True, many =True)
-    class Meta:
-        model = ['name','slug','events']
-        lookup_field = 'slug'
-        extra_kwargs = {
-            'url':{'view_name':'tag-detail','lookup_field':'slug'}
-        }
 
-class EventSerializer(serializers.ModelSerializer):
-    # tag = TagSerializer(many=True)
-    # owner = UserSerializer( many=True, read_only=True)
+
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    tag = serializers.HyperlinkedRelatedField(
+        # many=True,
+        read_only=True,
+        view_name='tag-detail',
+        lookup_field='slug'
+    )
+   
 
     class Meta:
         model = Event 
         fields = ['id','event_id','url',
-        # 'owner',
-        'user','tag','name','slug','description','type',
+        
+        'user',
+        'tag',
+        'name','slug','description','type',
                  'start_date','end_date','county','town','address','venue','charge',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
                  'other_speaker_artist','bookmark','likes','is_featured','is_published','updated_date','created_date']
         read_only_fields =['user','event_id']
         lookup_field = 'slug'
         extra_kwargs = {
-            'url': {'view_name':'event-detail','lookup_field': 'slug'}
+            'url': {'view_name':'event-detail','lookup_field': 'slug'},
+            # 'user':{'view_name':'user-detail','lookup_field': 'username'}
         }
     def to_representation(self, instance):
             representation = super().to_representation(instance)
@@ -91,26 +90,21 @@ class EventSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Other Speaker/Artist Must Contain more than three characters')
         return value
    
+
+
 class TagSerializer(serializers.ModelSerializer):
-    # events =EventSerializer(read_only = True, many =True)
+    events =EventSerializer(read_only = True, many =True)
     class Meta:
-        model = ['name','url','slug','events']
-        # lookup_field = 'slug'
+        model = Tag
+        fields = ['name','slug']
+        lookup_field = 'slug'
         extra_kwargs = {
-            'url':{'view_name':'tag-detail','lookup_field':'slug'}
+            'tag':{'view_name':'event:tag-detail', 'lookup_field':'slug'}
         }
+# class CategorySerializer(serializers.ModelSerializer):
+#     # tag =TagSerializer(read_only = True, many =True)
+#     class Meta:
+#         model = Category
+#         fields = '__all__'
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    tag =TagSerializer(read_only = True, many =True)
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-class UserSerializer(serializers.ModelField):
-    category = CategorySerializer(read_only = True, many =True)
-    tag =EventSerializer(read_only = True, many =True)
-    event =EventSerializer(read_only = True, many =True)
-    class Meta:
-        model = User
-        fields = '__all__'
