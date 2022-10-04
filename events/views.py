@@ -35,9 +35,12 @@ class MultipleFieldLookupMixin():
         obj = get_object_or_404(queryset, **filter)  # Lookup the object
         self.check_object_permissions(self.request, obj)
         return obj
+
+
 class EventsViewset(viewsets.ModelViewSet):
     queryset = Tag.publishedTags.all()
     serializer_class = TagSerializer
+
     
 class EventsViewset(viewsets.ModelViewSet):
     # authentication_classes = [SessionAuthentication, BasicAuthentication]
@@ -70,7 +73,7 @@ class EventsViewset(viewsets.ModelViewSet):
     def this_user_events(self,request,username = None):
         user = get_object_or_404(User,username=username)
         user_id =user.id
-        queryset =self.get_queryset().filter(user_id =user_id)
+        queryset =self.get_queryset().filter(user_id = user_id)
         serializer =self.get_serializer(queryset,many =True)
         return Response(serializer.data)
 

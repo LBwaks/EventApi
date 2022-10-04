@@ -7,6 +7,7 @@ router = DefaultRouter()
 
 router.register(r'events',EventsViewset,basename="event")
 router.register(r'tags',EventsViewset,basename='tag')
+
 # router.register('(?P<tag__slug>[^/.]+)', EventsViewset)
 
 urlpatterns = [

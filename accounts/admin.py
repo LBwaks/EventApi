@@ -5,5 +5,5 @@ from .models import Profile
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display =('user','fname' ,'lname')
+    list_display =('user','name' ,)
 admin.site.register(Profile,ProfileAdmin)

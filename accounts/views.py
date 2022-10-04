@@ -1,6 +1,9 @@
 from django.shortcuts import render
+from rest_framework.parsers import FormParser,MultiPartParser
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .permissions import OwnerToEdit
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 # from knox.auth import AuthToken
 from .serializers import UserSerializer
@@ -8,6 +11,7 @@ from events.serializers import EventSerializer
 from events.models import Event
 from accounts.models import Profile
 from accounts.serializers import ProfileSerializer
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from django.contrib.auth.models import User
 from allauth.account.views import ConfirmEmailView
@@ -32,8 +36,32 @@ class UserViewset(viewsets.ModelViewSet):
 
 class ProfileViewset(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
+    parser_classes =[MultiPartParser,FormParser]
+    permission_classes =[IsAuthenticated,OwnerToEdit]
     queryset =Profile.objects.all()
     
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user_id = self.request.user.id
+        return  Profile.objects.filter(user = user_id)
+
+    def perform_create(self, serializer):
+        return super().perform_create(serializer.save(user=self.request.user))
+
+    # def retrieve(self, request, pk=None):
+    #     user_id = self.request.user.id
+    #     return  get_object_or_404(Profile , user = user_id)
+        
+    
+   
+
+class UserProfileViewset(viewsets.ModelViewSet):    
+    serializer_class = ProfileSerializer
+    parser_classes =[MultiPartParser,FormParser]
+    # permission_classes[]
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return  queryset.filter(user =self.kwargs['user_id'])
     
 class CustomConfirmEmailView(ConfirmEmailView):
     def get(self, *args, **kwargs):

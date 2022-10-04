@@ -7,16 +7,18 @@ from django.db.models.signals import pre_save
 from .managers import PublishedEventsManager,PublishedTagManager,PublishedCategoryManager
 import random ,string
 from django.urls import reverse
+from django_extensions.db.fields import AutoSlugField
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
 
-
+def my_slugify_function(content):
+    return content.replace('_', '-').lower()
 
 class Category(models.Model):
     user =models.ForeignKey(User,editable=False,related_name='events_category', on_delete=models.CASCADE,null=False)
     name = models.CharField(max_length= 50, unique=True)
-    slug = models.SlugField(null=False,unique=True)
+    slug = AutoSlugField(populate_from='name', slugify_function=my_slugify_function)
     description = models.TextField(max_length= 250)
     is_published = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
@@ -37,7 +39,7 @@ class Tag(models.Model):
     user =models.ForeignKey(User,editable=False,on_delete =models.CASCADE,null=False)
     category =models .ForeignKey(Category,related_name='category_tag',on_delete=models.CASCADE,null = False)
     name = models.CharField(max_length= 50,unique=True)
-    slug = models.SlugField(null=False,unique=True)
+    slug = AutoSlugField(populate_from='name', slugify_function=my_slugify_function)
     description = models.TextField(max_length= 250)
     is_published = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
@@ -77,10 +79,10 @@ def unique_event_id_generation(instance):
 class Event(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=False)
-    tag = models.ForeignKey(Tag, related_name='event_tag',on_delete=models.CASCADE,null=False)
+    tag = models.ManyToManyField(Tag, related_name='event_tag')
     event_id = models.CharField(blank=True, max_length= 30)
     # hitcount =
-    name = models.CharField(max_length=50,blank= False,null=False)
+    name = AutoSlugField(populate_from=['name','event_id'], slugify_function=my_slugify_function)
     slug = models.SlugField(null=False,unique=True)
     description = models.TextField()
     type = models.CharField(choices=types,max_length=20)
