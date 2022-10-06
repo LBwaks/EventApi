@@ -82,8 +82,8 @@ class Event(models.Model):
     tag = models.ManyToManyField(Tag, related_name='event_tag')
     event_id = models.CharField(blank=True, max_length= 30)
     # hitcount =
-    name = AutoSlugField(populate_from=['name','event_id'], slugify_function=my_slugify_function)
-    slug = models.SlugField(null=False,unique=True)
+    name = models.CharField( max_length=50)
+    slug = AutoSlugField(populate_from=['name','event_id'], slugify_function=my_slugify_function)
     description = models.TextField()
     type = models.CharField(choices=types,max_length=20)
 
@@ -131,4 +131,25 @@ pre_save.connect(pre_save_event_id,sender=Event)
 
 # def get_absolute_url(self):
 #     return reverse("event-detail", kwargs={"slug": self.slug})
+
+class Comment(models.Model):
+    event =models.ForeignKey(Event, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User,  on_delete=models.CASCADE)
+    content =models.TextField(max_length=255)
+    parent = models.ForeignKey("self", null=True,blank=True, on_delete=models.CASCADE)
+    is_active =models.BooleanField(default=True)
+    created_at= models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering =('-created_at',)
+
+    def __str__(self):
+        return  self.user.username 
+    def children(self):
+        return Comment.filter(parent=self)
+    @property 
+    def is_parent(self):
+        if self.parent is not None:
+           return False
+        return True
 

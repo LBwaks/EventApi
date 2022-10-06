@@ -26,7 +26,7 @@ admin.site.register(Tag,TagEventAdmin)
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ('id','event_id','name','type','start_date','is_featured','is_published','created_date',)
-    prepopulated_fields = {'slug':('name',)}
+    # prepopulated_fields = {'slug':('name',)}
     # search_fields =('','','','','','','','','','','','','','','','','','','','','')
     def save_model(self,request,obj,form,change):
         if not obj.user_id:

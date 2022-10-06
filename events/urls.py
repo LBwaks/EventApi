@@ -1,5 +1,5 @@
 from django.urls import path 
-from . views import EventsViewset,MyEvents,Search,UserEvents,EventByTag,LikeView,EventsViewset
+from . views import EventsViewset,MyEvents,CommentsViewset,Search,UserEvents,EventByTag,LikeView,EventsViewset
 from rest_framework.routers import DefaultRouter
 
 
@@ -7,6 +7,7 @@ router = DefaultRouter()
 
 router.register(r'events',EventsViewset,basename="event")
 router.register(r'tags',EventsViewset,basename='tag')
+router.register(r'comments',CommentsViewset,basename='comment')
 
 # router.register('(?P<tag__slug>[^/.]+)', EventsViewset)
 

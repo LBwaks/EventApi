@@ -2,11 +2,11 @@ from re import search
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from .serializers import EventSerializer, TagSerializer##UserSerializer,TagSerializer,CategorySerializer,
+from .serializers import CommentSerializer, EventSerializer, TagSerializer##UserSerializer,TagSerializer,CategorySerializer,
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Event,Tag,Category
+from .models import Event,Tag,Category,Comment
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import OwnerToEditOrDelete
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
@@ -16,6 +16,9 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend 
 from rest_framework import filters
 from .filters import EventFilter
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 from rest_framework.decorators import action
 
 
@@ -43,6 +46,7 @@ class EventsViewset(viewsets.ModelViewSet):
 
     
 class EventsViewset(viewsets.ModelViewSet):
+    # @method_decorator(cache_page(60*60*2))
     # authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticatedOrReadOnly,OwnerToEditOrDelete]
     queryset = Event.publishedEvents.all()
@@ -76,6 +80,20 @@ class EventsViewset(viewsets.ModelViewSet):
         queryset =self.get_queryset().filter(user_id = user_id)
         serializer =self.get_serializer(queryset,many =True)
         return Response(serializer.data)
+
+    @action(detail =False,methods=['post'],url_path='bookmark',permission_classes=[IsAuthenticatedOrReadOnly])
+    def bookmark(self,request,slug=None):
+        queryset = queryset.bookmark.filter(id = self.request.id).exists()     
+
+
+        pass
+class CommentsViewset(viewsets.ModelViewSet):
+    serializer_class =CommentSerializer
+    permission_classes =[IsAuthenticatedOrReadOnly]
+    queryset = Comment.objects.all()
+
+    def perform_create(self, serializer):
+        return super().perform_create(serializer.save(user=self.request.user))
 
 class LikeView(APIView):
     permission_classes =[IsAuthenticated]

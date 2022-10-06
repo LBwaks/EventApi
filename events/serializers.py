@@ -1,6 +1,6 @@
 from cgitb import lookup
 from rest_framework import serializers
-from .models import Event,Tag,Category
+from .models import Event,Tag,Category,Comment
 from django.contrib.auth.models import User
 
 
@@ -10,27 +10,31 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id','username']
 
-
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model =Comment
+        fields =['id','event','user','content','created_at']
+        read_only_fields =['user']
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    tag = serializers.HyperlinkedRelatedField(
-        # many=True,
-        read_only=True,
-        view_name='tag-detail',
-        lookup_field='slug'
-    )
-   
+    # tag = serializers.HyperlinkedRelatedField(
+    #     many=True,
+    #     read_only=True,
+    #     view_name='tag-detail',
+    #     # lookup_field='slug'
+    # )
+    comments =CommentSerializer(many =True,read_only=True)
 
     class Meta:
         model = Event 
         fields = ['id','event_id','url',
         
         'user',
-        'tag',
+        # 'tag',
         'name','slug','description','type',
                  'start_date','end_date','county','town','address','venue','charge',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
-                 'other_speaker_artist','bookmark','likes','is_featured','is_published','updated_date','created_date']
+                 'other_speaker_artist','bookmark','comments','likes','is_featured','is_published','updated_date','created_date']
         read_only_fields =['user','event_id']
         lookup_field = 'slug'
         extra_kwargs = {
@@ -90,6 +94,8 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             raise serializers.ValidationError('Other Speaker/Artist Must Contain more than three characters')
         return value
    
+
+
 
 
 class TagSerializer(serializers.ModelSerializer):
