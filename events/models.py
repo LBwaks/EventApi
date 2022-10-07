@@ -79,7 +79,7 @@ def unique_event_id_generation(instance):
 class Event(models.Model):
 
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=False)
-    tag = models.ManyToManyField(Tag, related_name='event_tag')
+    tags = models.ManyToManyField(Tag, related_name='tags')
     event_id = models.CharField(blank=True, max_length= 30)
     # hitcount =
     name = models.CharField( max_length=50)

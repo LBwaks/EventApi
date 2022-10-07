@@ -81,12 +81,32 @@ class EventsViewset(viewsets.ModelViewSet):
         serializer =self.get_serializer(queryset,many =True)
         return Response(serializer.data)
 
-    @action(detail =False,methods=['post'],url_path='bookmark',permission_classes=[IsAuthenticatedOrReadOnly])
-    def bookmark(self,request,slug=None):
-        queryset = queryset.bookmark.filter(id = self.request.id).exists()     
+    # @action(detail =False,methods=['post'],url_path='bookmark',permission_classes=[IsAuthenticatedOrReadOnly])
+    # def bookmark(self,request,slug=None):
+    #     queryset = queryset.bookmark.filter(id = self.request.id).exists()  
+    #     pass
+    # @action(detail=False,methods=['post','put'],url_path='like/<int:event_id>' ,permission_classes =[IsAuthenticatedOrReadOnly])
+    # def likeUnlike(self,request,event_id=None):
+    #     event = get_object_or_404(Event,id=event_id)
+    #     if event.likes.filter(id=request.user.id).exists():
+    #         event.likes.remove(request.user)
+    #     else:
+    #         event.likes.add(request.user)
+    #     return Response
 
 
         pass
+    @action(detail=False,methods=['get'],url_path='user_bookmark',permission_classes=[IsAuthenticated])
+    def userBookmarks(self,request,username=None):
+        user = self.request.user
+        queryset = self.get_queryset().filter(bookmark = user)
+        page =self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many = True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset,many=True)
+        return Response(serializer.data)
+
 class CommentsViewset(viewsets.ModelViewSet):
     serializer_class =CommentSerializer
     permission_classes =[IsAuthenticatedOrReadOnly]
@@ -104,7 +124,16 @@ class LikeView(APIView):
 
         else :
             event.likes.add(request.user)
-        return Response
+        return Response()
+class AddBookmark(APIView):
+    permission_classes =[IsAuthenticated]
+    def post(self,request,event_id):
+        event = get_object_or_404(Event,id = event_id)
+        if event.bookmark.filter(pk=request.user.pk).exists():
+            event.bookmark.remove(request.user)
+        else:
+            event.bookmark.add(request.user)
+        return Response()
 
 class Search(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,OwnerToEditOrDelete]
@@ -153,4 +182,7 @@ class EventByTag(generics.ListAPIView):
     def get_queryset(self):
         queryset =super().get_queryset()
         return queryset.filter(slug = self.kwargs['slug'])
-    
+
+class TagsViewSet(viewsets.ModelViewSet):
+    queryset = Tag.publishedTags.all()
+    serializer_class = TagSerializer

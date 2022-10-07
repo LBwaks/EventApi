@@ -17,12 +17,12 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields =['user']
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    # tag = serializers.HyperlinkedRelatedField(
-    #     many=True,
-    #     read_only=True,
-    #     view_name='tag-detail',
-    #     # lookup_field='slug'
-    # )
+    tags = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name='tag-detail',
+        # lookup_field='slug'
+    )
     comments =CommentSerializer(many =True,read_only=True)
 
     class Meta:
@@ -30,7 +30,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id','event_id','url',
         
         'user',
-        # 'tag',
+        'tags',
         'name','slug','description','type',
                  'start_date','end_date','county','town','address','venue','charge',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
@@ -39,11 +39,13 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         lookup_field = 'slug'
         extra_kwargs = {
             'url': {'view_name':'event-detail','lookup_field': 'slug'},
-            # 'user':{'view_name':'user-detail','lookup_field': 'username'}
+            'tags':{'view_name':'tag-detail','lookup_field': 'slug'}
         }
     def to_representation(self, instance):
             representation = super().to_representation(instance)
-            representation['event_likes'] = instance.likes.count()
+            # representation['likes'] = instance.likes.count()
+            representation['event_comments']=instance.comments.count()
+            # representation['bookmarks'] = instance.bookmark.count()
             return representation
 
 
@@ -102,10 +104,10 @@ class TagSerializer(serializers.ModelSerializer):
     events =EventSerializer(read_only = True, many =True)
     class Meta:
         model = Tag
-        fields = ['name','slug']
+        fields = ['name','url','slug','events']
         lookup_field = 'slug'
         extra_kwargs = {
-            'tag':{'view_name':'event:tag-detail', 'lookup_field':'slug'}
+            # 'url':{'view_name':'event:tag-detail', 'lookup_field':'slug'}
         }
 # class CategorySerializer(serializers.ModelSerializer):
 #     # tag =TagSerializer(read_only = True, many =True)

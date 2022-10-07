@@ -4,7 +4,7 @@ class EventFilter(FilterSet):
     class Meta:
         model = Event
         fields ={
-            'tag':['exact'],
+            'tags':['exact'],
             'charge':['lt','gt'],
             'start_date':['exact','date__gt']
             
