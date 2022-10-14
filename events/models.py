@@ -132,6 +132,15 @@ pre_save.connect(pre_save_event_id,sender=Event)
 # def get_absolute_url(self):
 #     return reverse("event-detail", kwargs={"slug": self.slug})
 
+
+def upload_to(instance, filename):
+    return 'events/images/{filename}'.format(filename=filename)
+
+class EventImage(models.Model):
+    event = models.ForeignKey(Event, related_name='event_images', on_delete=models.CASCADE)
+    images = models.ImageField(upload_to=upload_to, max_length=100, blank=True, null = True)
+
+
 class Comment(models.Model):
     event =models.ForeignKey(Event, related_name="comments", on_delete=models.CASCADE)
     user = models.ForeignKey(User,  on_delete=models.CASCADE)

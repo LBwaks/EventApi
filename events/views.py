@@ -59,6 +59,15 @@ class EventsViewset(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         return super().perform_create(serializer.save(user=self.request.user))
+    def multiple_images(self,request, *args, **kwargs):
+        serializer = MultipleImageSerializer(data = request.data or None)
+        serializer.is_valid(raise_execption=True)
+        images = serializer.validated_data.get('images')
+        files_list = []
+        for file in images :
+            files_list.append(EventImage(images=file))
+        if files_list:
+            EventImage.objects.bulk_create(files_lis-0)
 
    
     @action(detail=False,methods=['get'],url_path='my_events',permission_classes=[IsAuthenticated])

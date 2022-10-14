@@ -1,6 +1,6 @@
 from cgitb import lookup
 from rest_framework import serializers
-from .models import Event,Tag,Category,Comment
+from .models import Event,Tag,Category,Comment,EventImage
 from django.contrib.auth.models import User
 
 
