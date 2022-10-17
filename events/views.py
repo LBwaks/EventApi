@@ -94,17 +94,15 @@ class EventsViewset(viewsets.ModelViewSet):
     # def bookmark(self,request,slug=None):
     #     queryset = queryset.bookmark.filter(id = self.request.id).exists()  
     #     pass
-    # @action(detail=False,methods=['post','put'],url_path='like/<int:event_id>' ,permission_classes =[IsAuthenticatedOrReadOnly])
-    # def likeUnlike(self,request,event_id=None):
-    #     event = get_object_or_404(Event,id=event_id)
-    #     if event.likes.filter(id=request.user.id).exists():
-    #         event.likes.remove(request.user)
-    #     else:
-    #         event.likes.add(request.user)
-    #     return Response
+    @action(detail=False,methods=['get','post','put'],url_path='likingg/(?P<event_id>[^/.]+)' ,permission_classes =[IsAuthenticated])
+    def likeUnlike(self,request,event_id=None):
+        event = get_object_or_404(Event,id=event_id)
+        if event.likes.filter(id=request.user.id).exists():
+            event.likes.remove(request.user)
+        else:
+            event.likes.add(request.user)
+        return Response()
 
-
-        pass
     @action(detail=False,methods=['get'],url_path='user_bookmark',permission_classes=[IsAuthenticated])
     def userBookmarks(self,request,username=None):
         user = self.request.user
