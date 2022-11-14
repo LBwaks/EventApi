@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class EventCategoryAdmin(admin.ModelAdmin):
     list_display= ('user','name','description','is_published','is_featured','created_date')
-    prepopulated_fields = {"slug": ("name",)}
+    # prepopulated_fields = {"slug": ("name",)}
     def save_model(self,request,obj,form,change):
         if not obj.user_id:
             obj.user =request.user
@@ -15,7 +15,7 @@ admin.site.register(Category,EventCategoryAdmin)
 
 class TagEventAdmin(admin.ModelAdmin):
     list_display=  ('user','name','description','is_published','is_featured','created_date')
-    prepopulated_fields ={'slug':('name',)}
+    # prepopulated_fields ={'slug':('name',)}
 
     def save_model(self,request,obj,form,change):
         if not obj.user_id:
@@ -25,7 +25,7 @@ admin.site.register(Tag,TagEventAdmin)
 
 
 class EventAdmin(admin.ModelAdmin):
-    list_display = ('id','event_id','name','type','start_date','is_featured','is_published','created_date',)
+    list_display = ('name','id','event_id','type','start_date','end_date','is_featured','is_published','created_date',)
     # prepopulated_fields = {'slug':('name',)}
     # search_fields =('','','','','','','','','','','','','','','','','','','','','')
     def save_model(self,request,obj,form,change):

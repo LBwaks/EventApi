@@ -32,7 +32,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         'user',
         'tags',
         'name','slug','description','type',
-                 'start_date','end_date','county','town','address','venue','charge',
+                 'start_date','end_date','county','town','address','venue','charge','slots',
                  'max_attendees','event_host' ,'event_partners','main_speaker_artist',
                  'other_speaker_artist','bookmark','comments','likes','is_featured','is_published','updated_date','created_date']
         read_only_fields =['user','event_id']
@@ -42,9 +42,11 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             'tags':{'view_name':'tag-detail','lookup_field': 'slug'}
         }
     def to_representation(self, instance):
-            representation = super().to_representation(instance)
+            representation = super(EventSerializer,self).to_representation(instance)
             # representation['likes'] = instance.likes.count()
             representation['event_comments']=instance.comments.count()
+            # representation['start_date'] = instance.start_date.strftime("%d-%m-%Y")
+            # representation['end_date'] = instance.end_date.strftime("%d-%m-%Y")
             # representation['bookmarks'] = instance.bookmark.count()
             return representation
 

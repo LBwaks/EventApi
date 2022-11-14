@@ -3,6 +3,7 @@ from . views import EventsViewset,MyEvents,TagsViewSet,AddBookmark,CommentsViews
 from rest_framework.routers import DefaultRouter
 
 
+
 router = DefaultRouter()
 
 router.register(r'events',EventsViewset,basename="event")

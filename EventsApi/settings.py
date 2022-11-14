@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from decouple import config
+
 from pathlib import Path
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -109,15 +112,25 @@ WSGI_APPLICATION = 'EventsApi.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# DATABASES ={
+#     'default':{
+#      'ENGINE':'django.db.backends.postgresql',
+#      "NAME":config("NAME"),
+#      'USER':config('USER'),
+#      'PASSWORD':config('PASSWORD'),
+#      'HOST':config('HOST'),
+#     }
+# }
 DATABASES ={
     'default':{
      'ENGINE':'django.db.backends.postgresql',
-     "NAME":config("NAME"),
-     'USER':config('USER'),
-     'PASSWORD':config('PASSWORD'),
-     'HOST':config('HOST'),
+     "NAME":'event',
+     'USER':'postgres',
+     'PASSWORD':'23C00K1E5',
+     'HOST':'localhost',
     }
 }
+
 
 
 # Password validation
@@ -159,9 +172,10 @@ REST_FRAMEWORK = {
     #     # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     #     # 'rest_framework.permissions.DjangoModelPermissions',
     # ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 2,
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    # "DATE_INPUT_FORMATS": ["%d-%m-%Y"],
     
 }
 REST_USE_JWT = True
@@ -213,3 +227,16 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# sentry settings
+# sentry_sdk.init(
+#     dsn="https://c83d1857a11541adb008303f0dcd7cec@o4504099387342848.ingest.sentry.io/4504100459118597",
+#     integrations=[
+#         DjangoIntegration(),
+#     ],
+
+   
+#     traces_sample_rate=1.0,
+
+#     send_default_pii=True
+# )

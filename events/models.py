@@ -2,12 +2,13 @@ from pyexpat import model
 from django.db import models
 from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.urls import reverse
+from django_extensions.db.fields import AutoSlugField
 from .choices import county,types
 from django.db.models.signals import pre_save
 from .managers import PublishedEventsManager,PublishedTagManager,PublishedCategoryManager
 import random ,string
-from django.urls import reverse
-from django_extensions.db.fields import AutoSlugField
+
 
 # Create your models here.
 User = settings.AUTH_USER_MODEL
@@ -33,7 +34,7 @@ class Category(models.Model):
         return super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 class Tag(models.Model):
     user =models.ForeignKey(User,editable=False,on_delete =models.CASCADE,null=False)
@@ -51,7 +52,7 @@ class Tag(models.Model):
     
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def save(self,*args, **kwargs):
         if not self.slug:
@@ -101,6 +102,7 @@ class Event(models.Model):
     # get_maps =
 
     charge = models.IntegerField()
+    slots = models.IntegerField()
     max_attendees = models.IntegerField(blank= True,null=True)
 
     event_host = models.CharField(max_length=50,blank= True,null=True)
@@ -114,14 +116,20 @@ class Event(models.Model):
     is_published = models.BooleanField(default=False)
     bookmark =models.ManyToManyField(User,related_name='bookmarks',blank=True,default=None)
 
-    updated_date = models.DateTimeField(null=True,blank=True)
+    updated_date = models.DateTimeField(auto_now=True)
     created_date = models.DateTimeField(auto_now_add=True)
 
     objects =models.Manager()
     publishedEvents = PublishedEventsManager()
 
     def __str__(self):
-        return self.name
+        return str(self.name)
+    
+    # def get_end_date(self,obj):
+    #     return obj.end_date.strftime("%d-%m-%Y")
+    
+    # def get_start_date(self,obj):
+    #     return obj.start_date.strftime("%d-%m-%Y")
 
 
 def pre_save_event_id(sender,instance,*args, **kwargs):

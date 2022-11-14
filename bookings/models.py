@@ -19,7 +19,7 @@ class Booking(models.Model):
     user = models.ForeignKey(User, related_name='user_bookings', on_delete=models.CASCADE,null=False)
     event =  models.ForeignKey(Event, related_name='bookings', on_delete=models.CASCADE,null=False)
     tickets = models.IntegerField(_("Number of Tickets"))
-    status = models.BooleanField(default='UNPAID')
+    status = models.CharField(max_length=25,default='UNPAID')
     updated_at = models.DateTimeField(auto_now=True,)
     created_at = models.DateTimeField(auto_now_add=True)
 
