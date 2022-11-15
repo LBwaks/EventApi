@@ -1,7 +1,11 @@
 from cgitb import lookup
 from rest_framework import serializers
-from .models import Event,Tag,Category,Comment,EventImage
 from django.contrib.auth.models import User
+from bookings.models import Booking
+from .models import Event,Tag,Category,Comment,EventImage
+# from bookings.serializers import BookingSerializer
+
+
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,10 +28,15 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
         # lookup_field='slug'
     )
     comments =CommentSerializer(many =True,read_only=True)
+    remaining_slots = serializers.SerializerMethodField()
+    # booked_slots = BookingSerializer(source = 'bookings',many=True)
+    booked_slots = serializers.SerializerMethodField()
 
     class Meta:
         model = Event 
-        fields = ['id','event_id','url',
+        fields = ['slots','booked_slots','remaining_slots',
+                #   'booked_slots',
+                  'id','event_id','url',
         
         'user',
         'tags',
@@ -49,7 +58,17 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
             # representation['end_date'] = instance.end_date.strftime("%d-%m-%Y")
             # representation['bookmarks'] = instance.bookmark.count()
             return representation
-
+        
+    def get_remaining_slots(self,obj):
+        slots = Booking.objects.filter(event_id = obj.id).count()
+        if slots  != obj.slots:
+            remaining_slots = 0
+            remaining_slots = (obj.slots - slots)
+            return remaining_slots
+    
+    def get_booked_slots(self,obj):
+        slots = Booking.objects.filter(event_id = obj.id)
+        return slots.count()
 
     def validate(self,data):
         if data['start_date'] == data['end_date']:
